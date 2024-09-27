@@ -5,7 +5,7 @@ shumei captcha icon select | 数美验证码点选识别破解 | 非模型纯算
 # 0x0 前言
 github开源地址：[https://github.com/taisuii/OpenCV_IconSelect](https://github.com/taisuii/OpenCV_IconSelect)
 #### 验证码分析
-验证码例子为
+验证码例子为，数美
 ![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/e4579b61e5e84897a68a1c674d2d73fb.png)
 
 我们不难可以发现这几个特征点
@@ -79,6 +79,25 @@ for max_info in results:
     match_tag_list.append(list(max_info[-1]))
 
 return match_tag_list
+```
+旋转图片，模板匹配
+```python
+# 旋转图片
+def rotate_image(template, angle):
+    center = (template.shape[1] // 2, template.shape[0] // 2)
+    rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
+    rotated_image = cv2.warpAffine(template, rotation_matrix, (template.shape[1], template.shape[0]),
+                                   flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+    return rotated_image
+
+
+# 模板匹配
+def template_match(template, img):
+    template_gray = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
+    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    res = cv2.matchTemplate(img_gray, template_gray, cv2.TM_CCOEFF_NORMED)
+    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+    return max_val, max_loc
 ```
 识别结果 300+ms，速度非常不错，使用了线程识别
 	[[132, 71], [181, 20], [88, 29], [221, 97]]
